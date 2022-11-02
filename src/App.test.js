@@ -7,61 +7,63 @@ import App from './App';
 beforeEach(() => {
   jest.useFakeTimers();
 });
-// import { act } from 'react-dom/test-utils';
 
 afterEach(() => {
   cleanup();
 });
 
-// test('renders first layout', () => {
-//   render(<App />);
-
-//   const linkElement = screen.getAllByText(/Counter/i);
-
-//   expect(linkElement).toHaveLength(2);
-
-//   const button = screen.getByText(/Pause/i);
-//   expect(button).toBeInTheDocument();
-// });
-
 it('should render the correct content', () => {
   render(<App />);
+  const button = screen.getByText(/Pause/i);
+  const counter1 = screen.getByTestId('counter-1');
+  const counter2 = screen.getByTestId('counter-2');
   const linkElement = screen.getAllByText(/Counter/i);
   expect(linkElement).toHaveLength(2);
+  expect(counter1).toHaveTextContent('0');
+  expect(counter2).toHaveTextContent('0');
+  expect(button).toHaveTextContent('Pause');
 });
 
-it('should pause the timer on click of the button', () => {
+it('should pause the timer on click of the button  after 1000ms', () => {
   render(<App />);
+
   const button = screen.getByText(/Pause/i);
   expect(button).toBeInTheDocument();
+
   act(() => {
     jest.advanceTimersByTime(1000);
     button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });
   const counter1 = screen.getByTestId('counter-1');
   const counter2 = screen.getByTestId('counter-2');
+
   expect(counter1).toHaveTextContent('1');
   expect(counter2).toHaveTextContent('1');
+
   expect(button).toHaveTextContent('Resume');
 });
 
-it('should pause the timer on click of the button after 10', () => {
+it('should pause the timer on click of the button after 11sec', () => {
   render(<App />);
+
   const button = screen.getByText(/Pause/i);
   expect(button).toBeInTheDocument();
+
   act(() => {
     jest.advanceTimersByTime(11000);
     button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });
+
   const counter1 = screen.getByTestId('counter-1');
   const counter2 = screen.getByTestId('counter-2');
 
   expect(counter1).toHaveTextContent('11');
   expect(counter2).toHaveTextContent('10');
+
   expect(button).toHaveTextContent('Resume');
 });
 
-it('should resume the timer on click of the button', () => {
+it('should resume and contiue the timer on click of the button', () => {
   render(<App />);
 
   const button = screen.getByText(/Pause/i);
