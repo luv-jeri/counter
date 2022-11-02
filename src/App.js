@@ -1,115 +1,117 @@
 import './App.css';
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-
-class Timer {
-  constructor(setter, interval = 1000) {
-    if (typeof setter !== 'function') throw new Error('setter must be a function');
-
-    setter((state) => {
-      if (state !== 0) throw new Error('state must be 0');
-      return 0;
-    });
-
-    this.setter = setter;
-    this.interval = interval;
-    this.point = new Date();
-    this.pausedAt = null;
-    this.timer = null;
-  }
-
-  start() {
-    this.timer = setInterval(() => {
-      this.point = new Date();
-      console.log(this.point);
-      this.setter((state) => state + 1);
-    }, this.interval);
-  }
-
-  pause() {
-    if (!this.timer) return console.log('Timer is not running');
-    if (this.pausedAt) return console.log('Timer is already paused');
-
-    this.pausedAt = new Date();
-    clearInterval(this.timer);
-  }
-
-  resume() {
-    if (this.timer) return console.log('Timer is already running');
-    if (!this.pausedAt) return console.log('Timer is not paused');
-
-    const diff = this.pausedAt - this.point;
-    setTimeout(() => {
-      this.point = new Date();
-      this.setter((state) => state + 1);
-      this.start();
-    }, diff);
-  }
-
-  stop() {
-    if (!this.timer) return console.log('Timer is not running');
-
-    this.setter(0);
-    clearInterval(this.timer);
-  }
-}
+import { useState, useMemo, useEffect, useRef } from 'react';
 
 function App() {
   const [counter, setCounter] = useState(0);
+  const [paused, setPaused] = useState(false);
 
-  const timer = useMemo(() => new Timer(setCounter), []);
-  console.log(timer);
-  // let i = useRef();
-  // let point = useRef();
-  // let pausedAt = useRef();
+  const point = useRef(null);
+  const pausedAt = useRef(null);
+  const timer = useRef(null);
+  const cover = useRef(null);
 
-  // const setTimer = useCallback((point) => {
-  //   if (!point || typeof point !== 'object')
-  //     throw new Error('setTimer: point is not a valid reference');
+  const interval = 1000;
 
-  //   const interval = setInterval(() => {
-  //     point.current = new Date();
-  //     console.log('point', point.current);
-  //     setCounter((state) => state + 1);
-  //   }, 1000);
+  const start = () => {
+    if (timer.current || cover.interval) return console.log('Timer is already running');
 
-  //   return interval;
-  // }, []);
+    pausedAt.current = null;
+    cover.current = null;
 
-  // useEffect(() => {
-  //   i.current = setTimer(point);
-  //   return () => {
-  //     clearInterval(i.current);
-  //   };
-  // }, [setTimer]);
+    timer.current = setInterval(() => {
+      point.current = new Date();
+      setCounter((state) => state + 1);
+    }, interval);
+  };
 
-  // const handleStop = () => {
-  //   pausedAt.current = new Date();
-  //   console.log('pausedAt', pausedAt.current);
-  //   clearInterval(i.current);
-  // };
+  const pause = () => {
+    if (!timer.current && !cover.current) return console.log('Timer is not running');
+    if (pausedAt.current) return console.log('Timer is already paused');
 
-  // const handleStart = () => {
-  //   const diff = pausedAt.current - point.current;
-  //   console.log('diff', diff);
-  //   pausedAt.current = null;
-  //   setTimeout(() => {
-  //     setCounter((state) => state + 1);
-  //     i.current = setTimer(point);
-  //   }, diff);
-  // };
+    if (cover.current) {
+      console.log('Clearing cover up');
+      clearTimeout(cover.current);
+      cover.current = null;
+    }
+
+    if (timer.current) {
+      console.log('Clearing timer');
+      clearInterval(timer.current);
+      timer.current = null;
+    }
+
+    pausedAt.current = new Date();
+
+    console.log('Paused at: ', pausedAt.current);
+
+    return pausedAt.current;
+  };
+
+  const resume = () => {
+    if (timer.current) return console.log('Timer is already running');
+    if (cover.current) return console.log('Timer is in cover up');
+
+    if (!pausedAt.current) return console.log('Timer is not paused');
+
+    const cover_up = interval - (pausedAt.current - point.current);
+    pausedAt.current = null;
+
+    if (cover_up > 0) {
+      cover.current = setTimeout(() => {
+        point.current = new Date();
+        setCounter((state) => state + 1);
+        start();
+      }, cover_up);
+    } else {
+      start();
+    }
+
+    return pausedAt.current;
+  };
+
+  const stop = () => {
+    timer.current && clearInterval(timer.current);
+    cover.current && clearTimeout(cover.current);
+
+    timer.current = null;
+    cover.current = null;
+    point.current = null;
+    pausedAt.current = null;
+
+    setCounter(0);
+  };
+
+  const toggle = () => {
+    if (timer.current || cover.current) {
+      console.log('Toggle Pausing');
+      pause();
+    } else {
+      console.log('Toggle Resuming');
+      resume();
+    }
+
+    setPaused(() => {
+      if (timer.current || cover.current) return false;
+      return true;
+    });
+  };
+
+  useEffect(() => {
+    start();
+    return () => {
+      stop();
+    };
+  }, []);
 
   return (
     <div className='App'>
-      <h1> Counter : {counter} </h1>
-      <h1> Counter : {counter < 10 ? counter : 10} </h1>
-      {/* <button
-        onClick={() => {
-          const { current } = pausedAt;
-          current ? handleStart() : handleStop();
-        }}
-      >
-        Pause{' '}
-      </button> */}
+      <h1 id='counter-1'>
+        Counter : <span data-testid='counter-1'>{counter}</span>
+      </h1>
+      <h1 id='counter-2'>
+        Counter : <span data-testid='counter-2'>{counter < 10 ? counter : 10}</span>
+      </h1>
+      <button onClick={toggle}>{!paused ? 'Pause' : 'Resume'}</button>
     </div>
   );
 }
