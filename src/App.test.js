@@ -1,6 +1,7 @@
 import { cleanup, render, screen, act, renderHook } from '@testing-library/react';
 import App from './App';
 
+
 beforeEach(() => {
   jest.useFakeTimers();
 });

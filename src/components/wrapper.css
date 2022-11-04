@@ -1,0 +1,79 @@
+.wrapper-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#toggle {
+    background-color: rgb(2, 38, 105);
+    height: 100px;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    max-height: 500px;
+    flex: 1;
+    overflow-y: scroll;
+    background-color: rgb(178, 178, 178);
+}
+
+.wrapper-down {
+    display: flex;
+}
+
+.menu-card {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(2, 38, 105);
+    min-height: 100px;
+    min-width: 100px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid white;
+    border-radius: 5px;
+    margin: 10px;
+    transition: 0.4s;
+}
+
+.menu-card:hover {
+    background-color: rgb(0, 0, 0);
+}
+
+.content {
+    flex: 3;
+    width: 100%;
+    background-color: blueviolet;
+    min-height: 100%;
+    display: flex;
+    align-items: start;
+}
+
+.content-card {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(2, 38, 105);
+    min-height: 100px;
+    min-width: 180px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid white;
+    border-radius: 5px;
+    margin: 10px;
+    transition: 0.4s;
+}
+
+.content-card:hover {
+    background-color: rgb(0, 0, 0);
+}
